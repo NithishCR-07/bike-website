@@ -45,3 +45,6 @@ next-env.d.ts
 !/lib/
 !/lib/**
 
+# sensitive auth services
+services/adminAuthService.js
+/services/adminAuthService.js
