@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, Database } from "lucide-react";
 import AddBikeForm from "@/components/bikes/AddBikeForm";
 import SupabaseBikesList from "@/components/bikes/SupabaseBikesList";
-// jfslkdfjs
+
 export default function AddBikePage() {
   const [refreshKey, setRefreshKey] = useState(0);
 
