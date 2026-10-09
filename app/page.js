@@ -1,69 +1,147 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import Navbar from "@/components/navbar/Navbar";
+import CategoryFilterCards from "@/components/bikes/CategoryFilterCards";
+import PopularBrands from "@/components/bikes/PopularBrands";
+import SupabaseBikesList from "@/components/bikes/SupabaseBikesList";
+import BikeFilterSidebar from "@/components/bikes/BikeFilterSidebar";
+import Footer from "@/components/footer/Footer";
+import { Filter } from "lucide-react";
 
 export default function Home() {
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("All");
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState(null);
+
+  // Filter Sidebar State
+  const [sortBy, setSortBy] = useState("latest");
+  const [maxPrice, setMaxPrice] = useState(500000);
+  const [maxKm, setMaxKm] = useState(100000);
+  const [ownerFilter, setOwnerFilter] = useState("all");
+  const [yearSort, setYearSort] = useState("all");
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+
+  const handleBikeAdded = () => {
+    setRefreshKey((prev) => prev + 1);
+  };
+
+  const handleResetFilters = () => {
+    setSortBy("latest");
+    setMaxPrice(500000);
+    setMaxKm(100000);
+    setOwnerFilter("all");
+    setYearSort("all");
+    setSelectedCategory(null);
+    setSelectedBrand(null);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.js
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="min-h-screen bg-[#f3f4f7] text-slate-900 font-sans flex flex-col relative">
+      
+      {/* 1. Real-time Demo Bikes Navbar */}
+      <Navbar
+        onSearch={setSearchQuery}
+      />
+
+      {/* 2. Main Page Content */}
+      <main className="flex-1 max-w-[1560px] mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+        
+        {/* Category Image Filter Cards (Scooters, Motor Bikes, Sports Bikes, Tourers) */}
+        <section aria-label="Filter bikes by category">
+          <CategoryFilterCards
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+          />
+        </section>
+
+        {/* Popular Brands Circular Cards (TVS, Hero, Honda, Royal Enfield, Suzuki, Yamaha, Bajaj, KTM) */}
+        <section aria-label="Filter bikes by brand">
+          <PopularBrands
+            selectedBrand={selectedBrand}
+            onBrandSelect={setSelectedBrand}
+          />
+        </section>
+
+        {/* Mobile Filter Toggle Button */}
+        <div className="lg:hidden flex items-center justify-between bg-white p-3.5 rounded-xl border border-slate-200/90 shadow-sm">
+          <span className="text-xs font-bold text-slate-700">Filter Bikes</span>
+          <button
+            type="button"
+            onClick={() => setIsMobileFilterOpen(!isMobileFilterOpen)}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#007e22] hover:bg-[#006e1e] text-white text-xs font-bold shadow-sm transition-all active:scale-95 cursor-pointer"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+            <Filter className="w-3.5 h-3.5 stroke-[2.2]" />
+            <span>{isMobileFilterOpen ? "Hide Filters" : "Show Filters"}</span>
+          </button>
+        </div>
+
+        {/* Mobile Filter Dropdown */}
+        {isMobileFilterOpen && (
+          <div className="lg:hidden">
+            <BikeFilterSidebar
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              maxPrice={maxPrice}
+              onMaxPriceChange={setMaxPrice}
+              maxKm={maxKm}
+              onMaxKmChange={setMaxKm}
+              ownerFilter={ownerFilter}
+              onOwnerChange={setOwnerFilter}
+              yearSort={yearSort}
+              onYearSortChange={setYearSort}
+              onResetFilters={handleResetFilters}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+          </div>
+        )}
+
+        {/* Live Supabase Stored Inventory with Left Sticky Filter Sidebar */}
+        <section id="inventory" className="relative">
+          <div className="grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-5 gap-6 items-start">
+            
+            {/* Left Sticky Sidebar: 1 column */}
+            <aside className="hidden lg:block lg:col-span-1 xl:col-span-1 2xl:col-span-1 sticky top-24 self-start">
+              <BikeFilterSidebar
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+                maxPrice={maxPrice}
+                onMaxPriceChange={setMaxPrice}
+                maxKm={maxKm}
+                onMaxKmChange={setMaxKm}
+                ownerFilter={ownerFilter}
+                onOwnerChange={setOwnerFilter}
+                yearSort={yearSort}
+                onYearSortChange={setYearSort}
+                onResetFilters={handleResetFilters}
+              />
+            </aside>
+
+            {/* Right Side Bike Grid */}
+            <div className="lg:col-span-3 xl:col-span-3 2xl:col-span-4 min-w-0">
+              <SupabaseBikesList 
+                refreshKey={refreshKey}
+                searchQuery={searchQuery}
+                locationFilter={selectedLocation}
+                categoryFilter={selectedCategory}
+                brandFilter={selectedBrand}
+                sortBy={sortBy}
+                maxPrice={maxPrice}
+                maxKm={maxKm}
+                ownerFilter={ownerFilter}
+                yearSort={yearSort}
+              />
+            </div>
+
+          </div>
+        </section>
+
       </main>
+
+      {/* 3. Clean Structured Footer */}
+      <Footer />
+
     </div>
   );
 }
