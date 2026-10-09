@@ -129,12 +129,7 @@ export default function Footer({ className = "" }) {
         {/* Divider */}
         <div className="border-t border-slate-200/80 pt-8 flex flex-col items-center justify-center space-y-2 text-center text-xs text-slate-500">
           <p>© 2026 Demo Bikes. All rights reserved.</p>
-          <p className="text-xs text-slate-600 font-medium">
-            Powered by{" "}
-            <span className="text-[#dc2626] font-bold tracking-wide">
-              SEYALI
-            </span>
-          </p>
+
         </div>
 
       </div>

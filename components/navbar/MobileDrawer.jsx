@@ -116,14 +116,7 @@ export default function MobileDrawer({
 
         {/* Bottom Actions */}
         <div className="pt-6 border-t border-slate-200 space-y-4">
-          <Link
-            href="/admin"
-            onClick={onClose}
-            className="w-full py-3 px-4 rounded-lg bg-[#007e22] hover:bg-[#006e1e] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95"
-          >
-            <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
-            <span>Staff Admin Portal</span>
-          </Link>
+
 
           <div className="text-[11px] text-slate-500 text-center space-y-1">
             <p className="font-bold text-slate-700">Demo Bikes Marketplace</p>
