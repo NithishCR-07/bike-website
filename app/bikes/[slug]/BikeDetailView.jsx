@@ -8,20 +8,12 @@ import {
   MapPin, 
   Phone, 
   MessageSquare, 
-  Mail,
-  Loader2, 
   AlertCircle,
-  Share2,
-  Calendar,
-  Gauge,
-  User,
-  Layers,
-  Tag,
-  Clock,
-  ShieldAlert
+  Share2
 } from "lucide-react";
 import { fetchBikeBySlugOrId } from "@/services/bikesService";
 import BrandLogo from "@/components/navbar/BrandLogo";
+import BikeDetailSkeleton from "@/components/bikes/BikeDetailSkeleton";
 
 export default function BikeDetailView({ paramsPromise }) {
   const router = useRouter();
@@ -116,14 +108,7 @@ export default function BikeDetailView({ paramsPromise }) {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 font-sans">
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-          <p className="text-sm font-semibold text-slate-700">Loading bike details from database...</p>
-        </div>
-      </div>
-    );
+    return <BikeDetailSkeleton />;
   }
 
   if (error || !bike) {
