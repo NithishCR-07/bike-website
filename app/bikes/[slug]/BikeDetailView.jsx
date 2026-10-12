@@ -198,15 +198,6 @@ export default function BikeDetailView({ paramsPromise }) {
           </div>
 
           <div className="flex items-center gap-2.5">
-            {isAdmin && (
-              <Link
-                href="/admin"
-                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-200 text-[#007e22] text-xs font-bold hover:bg-emerald-100 transition-colors"
-              >
-                <span>Admin Console</span>
-              </Link>
-            )}
-
             <button
               type="button"
               onClick={handleShare}

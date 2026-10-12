@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Loader2, AlertCircle, PlusCircle } from "lucide-react";
 import { fetchBikes, toggleBikeStatus } from "@/services/bikesService";
-import { createClient } from "@/lib/supabase/client";
 import { isAdminAuthenticated } from "@/services/adminAuthService";
 
 import AdminAuthGate from "@/components/admin/AdminAuthGate";
@@ -69,28 +68,6 @@ export default function AdminDashboardPage() {
     }
   }, [isAuthenticated, loadBikes]);
 
-  // Real-time Supabase Subscription for Admin Live Sync
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    const supabase = createClient();
-
-    const channel = supabase
-      .channel("admin-realtime-bikes")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "bikes" },
-        (payload) => {
-          console.log("⚡ Real-time database event in Admin Panel:", payload.eventType);
-          loadBikes(false);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [isAuthenticated, loadBikes]);
 
   // Handle inline quick status toggle
   const handleToggleStatus = async (bikeId, newStatus) => {

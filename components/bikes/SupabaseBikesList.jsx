@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Bike, RefreshCw } from "lucide-react";
 import { fetchBikes } from "../../services/bikesService";
-import { createClient } from "../../lib/supabase/client";
 import BikeCard from "./BikeCard";
 import { CATEGORY_CARDS } from "./CategoryFilterCards";
 
@@ -91,30 +90,6 @@ export default function SupabaseBikesList({
     loadBikes(false);
   }, [refreshKey, loadBikes]);
 
-  // Real-time Supabase Database Listener for Instant UI Sync
-  useEffect(() => {
-    const supabase = createClient();
-    
-    const channel = supabase
-      .channel("bikes-live-sync")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "bikes" },
-        () => {
-          loadBikes(false);
-        }
-      )
-      .subscribe();
-
-    const intervalId = setInterval(() => {
-      loadBikes(false);
-    }, 6000);
-
-    return () => {
-      supabase.removeChannel(channel);
-      clearInterval(intervalId);
-    };
-  }, [loadBikes]);
 
   const formatPrice = (val) => {
     return new Intl.NumberFormat("en-IN", {
