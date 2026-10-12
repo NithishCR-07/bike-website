@@ -2,11 +2,56 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Bike, Loader2, RefreshCw } from "lucide-react";
+import { Bike, RefreshCw } from "lucide-react";
 import { fetchBikes } from "../../services/bikesService";
 import { createClient } from "../../lib/supabase/client";
 import BikeCard from "./BikeCard";
 import { CATEGORY_CARDS } from "./CategoryFilterCards";
+
+function BikeCardSkeleton() {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col justify-between animate-pulse select-none">
+      {/* 1. Image Skeleton */}
+      <div className="relative aspect-[4/3] bg-slate-200/80" />
+
+      {/* 2. Content Body Skeleton */}
+      <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+        <div className="space-y-2.5">
+          {/* Price & Tag Skeleton */}
+          <div className="flex items-center justify-between">
+            <div className="h-7 w-28 bg-slate-200 rounded-lg" />
+            <div className="h-5 w-16 bg-slate-100 rounded-md" />
+          </div>
+
+          {/* Model Title Skeleton */}
+          <div className="h-5 w-3/4 bg-slate-200 rounded-md" />
+
+          {/* Inline Specs Skeleton */}
+          <div className="flex items-center gap-3 pt-1">
+            <div className="h-4 w-12 bg-slate-100 rounded" />
+            <div className="h-4 w-14 bg-slate-100 rounded" />
+            <div className="h-4 w-16 bg-slate-100 rounded" />
+            <div className="h-4 w-8 bg-slate-100 rounded" />
+          </div>
+        </div>
+
+        {/* Divider & Seller Box Skeleton */}
+        <div className="border-t border-slate-100 pt-3">
+          <div className="bg-[#eff4fc] rounded-xl p-2.5 flex items-center justify-between border border-slate-200/80">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-full bg-slate-200" />
+              <div className="space-y-1">
+                <div className="h-3.5 w-20 bg-slate-200 rounded" />
+                <div className="h-2.5 w-12 bg-slate-200/70 rounded" />
+              </div>
+            </div>
+            <div className="w-10 h-10 rounded-full bg-slate-200" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function SupabaseBikesList({ 
   refreshKey, 
@@ -81,9 +126,12 @@ export default function SupabaseBikesList({
 
   if (loading) {
     return (
-      <div className="py-12 text-center text-slate-500 flex flex-col items-center gap-2">
-        <Loader2 className="w-6 h-6 animate-spin text-emerald-600" />
-        <span className="text-xs font-semibold">Fetching live bikes from Supabase...</span>
+      <div className="font-sans" aria-label="Loading bike listings">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-5 sm:gap-6">
+          {Array.from({ length: 6 }).map((_, idx) => (
+            <BikeCardSkeleton key={idx} />
+          ))}
+        </div>
       </div>
     );
   }
@@ -109,9 +157,9 @@ export default function SupabaseBikesList({
         <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
           <Bike className="w-6 h-6" />
         </div>
-        <h4 className="text-base font-bold text-slate-800">No bikes found in Supabase table</h4>
+        <h4 className="text-base font-bold text-slate-800">No bikes currently available</h4>
         <p className="text-xs text-slate-500 max-w-md mx-auto">
-          Add a bike using the form above to view its listing and full details page.
+          No bike listings were found. Please check back later or add a new listing.
         </p>
         <button
           onClick={() => loadBikes(true)}
@@ -119,7 +167,7 @@ export default function SupabaseBikesList({
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#007e22] hover:bg-[#006e1e] text-white text-xs font-bold transition-all shadow-sm active:scale-95 cursor-pointer disabled:opacity-50"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
-          <span>{isRefreshing ? "Checking..." : "Refresh From Database"}</span>
+          <span>{isRefreshing ? "Refreshing..." : "Refresh Listings"}</span>
         </button>
       </div>
     );

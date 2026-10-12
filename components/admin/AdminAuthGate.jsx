@@ -34,8 +34,7 @@ export default function AdminAuthGate({ onAuthenticated }) {
       await loginAdminWithEmail(email, password);
       onAuthenticated();
     } catch (err) {
-      console.error("Auth error:", err);
-      setError(err.message || "Invalid email or password. Please try again.");
+      setError(err?.message || "Invalid login credentials.");
     } finally {
       setLoading(false);
     }
@@ -67,10 +66,10 @@ export default function AdminAuthGate({ onAuthenticated }) {
           </p>
         </div>
 
-        {/* Error Notification */}
+        {/* Clean Error Notification */}
         {error && (
-          <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs font-medium flex items-center gap-2 animate-shake">
-            <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+          <div className="p-3.5 rounded-xl bg-red-50/90 border border-red-200 text-red-700 text-xs font-semibold flex items-center gap-2.5 animate-shake shadow-xs">
+            <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
@@ -91,12 +90,19 @@ export default function AdminAuthGate({ onAuthenticated }) {
                 id="admin-email"
                 type="email"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@demobikes.com"
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError(null);
+                }}
+                placeholder="admin@gmail.com"
                 autoFocus
                 autoComplete="email"
                 required
-                className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none focus:border-[#007e22] focus:ring-1 focus:ring-[#007e22] transition-all"
+                className={`w-full pl-9 pr-3 py-2.5 rounded-lg text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none transition-all ${
+                  error
+                    ? "border border-red-300 bg-red-50/30 focus:border-red-500 focus:ring-1 focus:ring-red-400"
+                    : "bg-white border border-slate-300 focus:border-[#007e22] focus:ring-1 focus:ring-[#007e22]"
+                }`}
               />
             </div>
           </div>
@@ -114,11 +120,18 @@ export default function AdminAuthGate({ onAuthenticated }) {
                 id="admin-password"
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (error) setError(null);
+                }}
                 placeholder="••••••••••••"
                 autoComplete="current-password"
                 required
-                className="w-full pl-9 pr-10 py-2.5 rounded-lg bg-white border border-slate-300 text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none focus:border-[#007e22] focus:ring-1 focus:ring-[#007e22] transition-all"
+                className={`w-full pl-9 pr-10 py-2.5 rounded-lg text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none transition-all ${
+                  error
+                    ? "border border-red-300 bg-red-50/30 focus:border-red-500 focus:ring-1 focus:ring-red-400"
+                    : "bg-white border border-slate-300 focus:border-[#007e22] focus:ring-1 focus:ring-[#007e22]"
+                }`}
               />
               <button
                 type="button"

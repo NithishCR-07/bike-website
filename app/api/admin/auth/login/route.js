@@ -28,16 +28,16 @@ export async function POST(request) {
       .maybeSingle();
 
     if (queryError) {
-      console.error("Supabase admin_users query error:", queryError.message);
+      console.warn("Database query notice:", queryError.message);
       return NextResponse.json(
-        { error: `Database error querying admin_users: ${queryError.message}` },
-        { status: 500 }
+        { error: "Invalid login credentials." },
+        { status: 401 }
       );
     }
 
     if (!adminUser) {
       return NextResponse.json(
-        { error: "Admin user not found in Supabase 'admin_users' table." },
+        { error: "Invalid login credentials." },
         { status: 401 }
       );
     }
@@ -46,7 +46,7 @@ export async function POST(request) {
     const storedHash = adminUser.password ?? adminUser.password_hash ?? "";
     if (!storedHash) {
       return NextResponse.json(
-        { error: "No password configured for this admin user." },
+        { error: "Invalid login credentials." },
         { status: 401 }
       );
     }
@@ -56,7 +56,7 @@ export async function POST(request) {
 
     if (!isValid) {
       return NextResponse.json(
-        { error: "Invalid password for this admin user." },
+        { error: "Invalid login credentials." },
         { status: 401 }
       );
     }
@@ -89,10 +89,10 @@ export async function POST(request) {
       user: sessionPayload,
     });
   } catch (err) {
-    console.error("Admin Login Error:", err);
+    console.warn("Login authentication notice:", err?.message || "Auth error");
     return NextResponse.json(
-      { error: "Server authentication error: " + (err.message || "Unknown error") },
-      { status: 500 }
+      { error: "Invalid login credentials." },
+      { status: 401 }
     );
   }
 }

@@ -34,6 +34,9 @@ export async function fetchBikeTypes() {
   return data || [];
 }
 
+export const INDIAN_PHONE_REGEX = /^[6-9]\d{9}$/;
+export const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 /**
  * Inserts a new bike listing into Supabase database.
  * Includes intelligent column fallback (registration_year vs year_of_model).
@@ -44,7 +47,16 @@ export function sanitizeBikePayload(input) {
   const payload = {};
 
   if (input.seller_name !== undefined) payload.seller_name = String(input.seller_name).trim();
-  if (input.contact_number !== undefined) payload.contact_number = String(input.contact_number).trim();
+  if (input.contact_number !== undefined) {
+    let cleanPhone = String(input.contact_number).replace(/\D/g, "");
+    if (cleanPhone.length === 12 && cleanPhone.startsWith("91")) {
+      cleanPhone = cleanPhone.slice(2);
+    } else if (cleanPhone.length === 11 && cleanPhone.startsWith("0")) {
+      cleanPhone = cleanPhone.slice(1);
+    }
+    if (cleanPhone.length > 10) cleanPhone = cleanPhone.slice(0, 10);
+    payload.contact_number = cleanPhone;
+  }
   if (input.email_address !== undefined) {
     payload.email_address = String(input.email_address).trim().toLowerCase();
   } else if (input.seller_name) {

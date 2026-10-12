@@ -25,7 +25,7 @@ export async function loginAdminWithEmail(email, password) {
   const data = await response.json();
 
   if (!response.ok || !data.success) {
-    throw new Error(data.error || "Authentication failed. Invalid admin credentials.");
+    throw new Error(data.error || "Invalid login credentials.");
   }
 
   const sessionObj = {

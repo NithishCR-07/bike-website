@@ -199,7 +199,7 @@ export default function AdminDashboardPage() {
           {loading ? (
             <div className="bg-white rounded-3xl p-16 border border-slate-200 text-center flex flex-col items-center gap-3">
               <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-              <p className="text-sm font-bold text-slate-700">Loading live inventory from Supabase...</p>
+              <p className="text-sm font-bold text-slate-700">Loading inventory...</p>
             </div>
           ) : (
             <AdminBikesTable

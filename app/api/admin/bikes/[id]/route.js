@@ -6,7 +6,16 @@ function sanitizePayloadForPostgres(input) {
   const payload = {};
 
   if (input.seller_name !== undefined) payload.seller_name = String(input.seller_name).trim();
-  if (input.contact_number !== undefined) payload.contact_number = String(input.contact_number).trim();
+  if (input.contact_number !== undefined) {
+    let cleanPhone = String(input.contact_number).replace(/\D/g, "");
+    if (cleanPhone.length === 12 && cleanPhone.startsWith("91")) {
+      cleanPhone = cleanPhone.slice(2);
+    } else if (cleanPhone.length === 11 && cleanPhone.startsWith("0")) {
+      cleanPhone = cleanPhone.slice(1);
+    }
+    if (cleanPhone.length > 10) cleanPhone = cleanPhone.slice(0, 10);
+    payload.contact_number = cleanPhone;
+  }
   if (input.email_address !== undefined) payload.email_address = String(input.email_address).trim().toLowerCase();
   if (input.brand_id !== undefined) payload.brand_id = parseInt(input.brand_id, 10);
   if (input.bike_model !== undefined) payload.bike_model = String(input.bike_model).trim();
@@ -36,6 +45,23 @@ export async function PATCH(request, context) {
 
     const rawBody = await request.json();
     const payload = sanitizePayloadForPostgres(rawBody);
+
+    const INDIAN_PHONE_REGEX = /^[6-9]\d{9}$/;
+    const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (payload.contact_number && !INDIAN_PHONE_REGEX.test(payload.contact_number)) {
+      return NextResponse.json(
+        { error: "Invalid contact number. Must be a 10-digit Indian phone number starting with 6, 7, 8, or 9." },
+        { status: 400 }
+      );
+    }
+
+    if (payload.email_address && !EMAIL_REGEX.test(payload.email_address)) {
+      return NextResponse.json(
+        { error: "Invalid email address format." },
+        { status: 400 }
+      );
+    }
 
     if (Object.keys(payload).length === 0) {
       return NextResponse.json({ error: "No valid fields provided for update" }, { status: 400 });

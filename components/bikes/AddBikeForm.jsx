@@ -55,6 +55,7 @@ export default function AddBikeForm({ onBikeAdded, onClose }) {
   // Submission States
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const [emailError, setEmailError] = useState(null);
   const [success, setSuccess] = useState(false);
 
   // Load brands and types from Supabase
@@ -100,8 +101,30 @@ export default function AddBikeForm({ onBikeAdded, onClose }) {
     loadData();
   }, []);
 
+const INDIAN_PHONE_REGEX = /^[6-9]\d{9}$/;
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handlePhoneChange = (e) => {
+    let val = e.target.value.replace(/\D/g, "");
+    if (val.length === 12 && val.startsWith("91")) {
+      val = val.slice(2);
+    } else if (val.length === 11 && val.startsWith("0")) {
+      val = val.slice(1);
+    }
+    if (val.length > 10) {
+      val = val.slice(0, 10);
+    }
+    setFormData((prev) => ({ ...prev, contact_number: val }));
+  };
+
+  const handleEmailChange = (e) => {
+    setFormData((prev) => ({ ...prev, email_address: e.target.value.trim() }));
+    if (emailError) setEmailError(null);
+    if (error) setError(null);
   };
 
   // Real-time Upload on file selection
@@ -139,10 +162,31 @@ export default function AddBikeForm({ onBikeAdded, onClose }) {
       setError("Please enter the Selling Price.");
       return;
     }
-    if (!formData.seller_name.trim() || !formData.contact_number.trim()) {
-      setError("Please provide Seller Name and Contact Number.");
+    if (!formData.seller_name.trim()) {
+      setError("Please provide the Seller Name.");
       return;
     }
+
+    // Validate Indian Phone Number
+    const cleanPhone = (formData.contact_number || "").trim();
+    if (!cleanPhone) {
+      setError("Please provide a Contact Phone Number.");
+      return;
+    }
+    if (!INDIAN_PHONE_REGEX.test(cleanPhone)) {
+      setError("Please enter a valid 10-digit Indian phone number starting with 6, 7, 8, or 9.");
+      return;
+    }
+
+    // Validate Email Address (if provided)
+    const cleanEmail = (formData.email_address || "").trim();
+    if (cleanEmail && !EMAIL_REGEX.test(cleanEmail)) {
+      const msg = "Invalid email address";
+      setError(msg);
+      setEmailError(true);
+      return;
+    }
+    setEmailError(false);
 
     setSubmitting(true);
     setError(null);
@@ -408,9 +452,22 @@ export default function AddBikeForm({ onBikeAdded, onClose }) {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-slate-700">
-              Phone Number
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-700">
+                Phone Number <span className="text-red-500">*</span>
+              </label>
+              {formData.contact_number ? (
+                <span
+                  className={`text-[10px] font-semibold ${
+                    INDIAN_PHONE_REGEX.test(formData.contact_number)
+                      ? "text-[#007e22]"
+                      : "text-amber-600"
+                  }`}
+                >
+                  {formData.contact_number.length}/10 digits
+                </span>
+              ) : null}
+            </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                 <Phone className="w-4 h-4" />
@@ -418,12 +475,16 @@ export default function AddBikeForm({ onBikeAdded, onClose }) {
               <input
                 type="tel"
                 value={formData.contact_number}
-                onChange={(e) => handleInputChange("contact_number", e.target.value)}
-                placeholder="e.g. 7904209463"
+                onChange={handlePhoneChange}
+                placeholder="10-digit mobile (e.g. 9876543210)"
+                maxLength={10}
                 required
                 className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-[#eff4fc] border border-slate-200 text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none focus:bg-white focus:border-[#007e22] focus:ring-1 focus:ring-[#007e22] transition-all"
               />
             </div>
+            {formData.contact_number && !INDIAN_PHONE_REGEX.test(formData.contact_number) && formData.contact_number.length === 10 && (
+              <p className="text-[11px] text-red-500 font-medium">Must start with 6, 7, 8, or 9</p>
+            )}
           </div>
         </div>
 
@@ -440,9 +501,13 @@ export default function AddBikeForm({ onBikeAdded, onClose }) {
               <input
                 type="email"
                 value={formData.email_address}
-                onChange={(e) => handleInputChange("email_address", e.target.value)}
+                onChange={handleEmailChange}
                 placeholder="e.g. seller@demobikes.com"
-                className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-[#eff4fc] border border-slate-200 text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none focus:bg-white focus:border-[#007e22] focus:ring-1 focus:ring-[#007e22] transition-all"
+                className={`w-full pl-9 pr-3 py-2.5 rounded-lg text-slate-900 placeholder-slate-400 text-sm font-medium focus:outline-none transition-all ${
+                  emailError
+                    ? "bg-red-50/50 border border-red-400 focus:border-red-500 focus:ring-1 focus:ring-red-400"
+                    : "bg-[#eff4fc] border border-slate-200 focus:bg-white focus:border-[#007e22] focus:ring-1 focus:ring-[#007e22]"
+                }`}
               />
             </div>
           </div>
